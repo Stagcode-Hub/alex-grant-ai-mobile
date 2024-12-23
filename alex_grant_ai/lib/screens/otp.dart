@@ -44,14 +44,18 @@ class _OtpState extends State<OtpState> {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      if (_timeRemaining > 0) {
-        setState(() {
-          _timeRemaining--;
-        });
-      } else {
-        _timer.cancel(); // Stop the timer when it reaches 0
-      }
+    // If there's an existing timer, cancel it before starting a new one
+    _timer?.cancel();
+
+    // Start the timer
+    _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
+      setState(() {
+        if (_timeRemaining > 0) {
+          _timeRemaining--; // Decrement the timer every second
+        } else {
+          _timer?.cancel(); // Stop the timer when it reaches 0
+        }
+      });
     });
   }
 
@@ -65,6 +69,51 @@ class _OtpState extends State<OtpState> {
       FocusScope.of(context).requestFocus(focusNodes[index - 1]);
     }
   }
+  // Function to handle OTP resend and show Snackbar
+  void _resendOtp() {
+    setState(() {
+      _timeRemaining = 45; // Reset timer when OTP is resent
+    });
+    _startTimer(); // Restart the timer
+
+    // Show Snackbar indicating OTP resend with custom styling
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Image.asset(
+              'assets/images/Tick.png',  // Path to your image
+              width: 24,  // Width of the image
+              height: 24,  // Height of the image
+            ),
+            SizedBox(width: 8), // Space between the image and the text
+            Expanded( // Use Expanded to allow text to wrap properly
+              child: Text(
+                'The OTP has been resent',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontFamily: 'Euclid Circular A',
+                  fontWeight: FontWeight.w600,
+                ),
+                overflow: TextOverflow.ellipsis, // Avoid overflow if the text is too long
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Color(0xFF15A336), // Fully opaque green color
+        duration: Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.only(bottom: 80, left: 20, right: 20), // Adjusted margin for better placement
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+
+
+
 
   @override
   void dispose() {
@@ -80,6 +129,7 @@ class _OtpState extends State<OtpState> {
   @override
   Widget build(BuildContext context) {
     return Scaffold( // Keep Material here for transparent background
+
       body: SingleChildScrollView(
         child: Material(
           color: Colors.transparent,
@@ -209,36 +259,39 @@ class _OtpState extends State<OtpState> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center, // Align text vertically in the center
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: 'Didn’t receive the code? ',
-                                    style: TextStyle(
-                                      color: Color(0xFFE4E6EB),
-                                      fontSize: 14,
-                                      fontFamily: 'Euclid Circular A',
-                                      fontWeight: FontWeight.w300,
-                                      height: 1.14,
-                                      letterSpacing: -0.40,
+                            GestureDetector(
+                              onTap: _resendOtp, // Trigger OTP resend
+                              child: Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: 'Didn’t receive the code? ',
+                                      style: TextStyle(
+                                        color: Color(0xFFE4E6EB),
+                                        fontSize: 14,
+                                        fontFamily: 'Euclid Circular A',
+                                        fontWeight: FontWeight.w300,
+                                        height: 1.14,
+                                        letterSpacing: -0.40,
+                                      ),
                                     ),
-                                  ),
-                                  TextSpan(
-                                    text: 'Resend code ($_timeRemaining) ',
-                                    style: TextStyle(
-                                      color: Color(0xFF8E44BE),
-                                      fontSize: 14,
-                                      fontFamily: 'Euclid Circular A',
-                                      fontWeight: FontWeight.w600,
-                                      height: 1.14,
-                                      letterSpacing: -0.40,
+                                    TextSpan(
+                                      text: 'Resend code ($_timeRemaining) ',
+                                      style: TextStyle(
+                                        color: Color(0xFF8E44BE),
+                                        fontSize: 14,
+                                        fontFamily: 'Euclid Circular A',
+                                        fontWeight: FontWeight.w600,
+                                        height: 1.14,
+                                        letterSpacing: -0.40,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
+                                textAlign: TextAlign.left,
                               ),
-                              textAlign: TextAlign.left, // Align text to the left of the Row
                             ),
                           ],
                         ),
@@ -321,6 +374,7 @@ class _OtpState extends State<OtpState> {
                               onTap: () {
                                 print('Button clicked!');
                                 // Add your onTap logic here
+                                _showOtpVerifiedSuccessfullyModal(context);
                               },
                               child: Center(
                                 child: Text(
@@ -352,4 +406,80 @@ class _OtpState extends State<OtpState> {
       ),
     );
   }
+}
+void _showOtpVerifiedSuccessfullyModal(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Prevent closing the modal by tapping outside
+    builder: (BuildContext context) {
+      return Dialog(
+        backgroundColor: Colors.transparent, // Transparent background
+        child: Center( // Center the modal in the middle of the screen
+          child: Container(
+            width: 400,
+            height: 450,
+            padding: const EdgeInsets.all(32),
+            decoration: ShapeDecoration(
+              color: Color(0xFF161117),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            child: Column(
+
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween, // Space between text and button
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 200), // Add space on top of the text
+                SizedBox(
+                  width: 240,
+
+                  child: Text(
+                    'Email Verified Successfully!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 21,
+                      fontFamily: 'Euclid Circular A',
+                      fontWeight: FontWeight.w600,
+                      height: 1.43,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the modal
+                    // _showConfirmEmailModal(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF5E216D), // Set background color here
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 16),
+                  ),
+                  child: Text(
+                    'Login to Your Account',
+                    textAlign: TextAlign.center, // Center-align the text
+                    overflow: TextOverflow.ellipsis, // Handle overflow with an ellipsis
+                    maxLines: 1, // Ensure the text stays on one line
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontFamily: 'Euclid Circular A',
+                      fontWeight: FontWeight.w600,
+                      height: 1,
+                      letterSpacing: -0.40,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
 }
