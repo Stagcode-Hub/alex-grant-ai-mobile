@@ -129,6 +129,7 @@ class SplashScreen3 extends StatelessWidget {
               Positioned(
                 left: 17,
                 top: 726,
+                right:10,
                 child: GestureDetector(
                   onTap: () {
                     // Navigate to another screen when the button is clicked

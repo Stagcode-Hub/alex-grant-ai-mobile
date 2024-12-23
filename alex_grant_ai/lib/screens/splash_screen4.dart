@@ -1,3 +1,4 @@
+import 'package:alex_grant_ai/screens/sign_up.dart';
 import 'package:alex_grant_ai/screens/slpash_screen3.dart';
 import 'package:flutter/material.dart';
 class SplashScreen04 extends StatelessWidget {
@@ -125,6 +126,16 @@ class SplashScreen4 extends StatelessWidget {
                 left: 12,
                 top: 726,
                 right: 10,
+                child: GestureDetector(
+                  onTap: () {
+                    // Navigate to another screen when the button is clicked
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SignUpState(), // Replace NextScreen with your target screen
+                      ),
+                    );
+                  },
                 child: Container(
                   width: 366,
                   height: 56,
@@ -155,6 +166,7 @@ class SplashScreen4 extends StatelessWidget {
                       ),
                     ],
                   ),
+                ),
                 ),
               ),
               Positioned(
