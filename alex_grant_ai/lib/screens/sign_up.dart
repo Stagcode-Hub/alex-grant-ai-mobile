@@ -21,9 +21,15 @@ class SignUp extends StatelessWidget {
 }
 
 class SignUpState extends StatelessWidget {
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Scaffold(
+        body: SingleChildScrollView(  // Wrap your body with SingleChildScrollView
+            child: Material(  // Make sure you
+        color: Colors.transparent,  // If you want a transparent background
+        child: Column(
       children: [
         Container(
           width: MediaQuery.of(context).size.width, // Full width of the screen
@@ -88,6 +94,7 @@ class SignUpState extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Username TextField
                       Container(
                         width: 320,
                         height: 88,
@@ -153,17 +160,26 @@ class SignUpState extends StatelessWidget {
                                     ),
                                   ),
                                   Expanded(
-                                    child: SizedBox(
-                                      child: Text(
-                                        'Your username',
-                                        style: TextStyle(
+                                    child: TextField(
+                                      controller: usernameController,
+                                      style: TextStyle(
+                                        color: Color(0xFF908A95),
+                                        fontSize: 14,
+                                        fontFamily: 'Euclid Circular A',
+                                        fontWeight: FontWeight.w400,
+                                        height: 1.50,
+                                        decoration: TextDecoration.none,
+                                      ),
+                                      decoration: InputDecoration(
+                                        hintText: 'Your username',
+                                        hintStyle: TextStyle(
                                           color: Color(0xFF908A95),
                                           fontSize: 14,
                                           fontFamily: 'Euclid Circular A',
                                           fontWeight: FontWeight.w400,
                                           height: 1.50,
-                                          decoration: TextDecoration.none,  // Add this line to remove any underline
                                         ),
+                                        border: InputBorder.none,  // Removes the border
                                       ),
                                     ),
                                   ),
@@ -239,18 +255,41 @@ class SignUpState extends StatelessWidget {
                                     ),
                                   ),
                                   Expanded(
-                                    child: SizedBox(
-                                      child: Text(
-                                        'Your username',
-                                        style: TextStyle(
+                                    child: TextFormField(
+                                      controller: emailController,
+                                      style: TextStyle(
+                                        color: Color(0xFF908A95),
+                                        fontSize: 14,
+                                        fontFamily: 'Euclid Circular A',
+                                        fontWeight: FontWeight.w400,
+                                        height: 1.50,
+                                        decoration: TextDecoration.none,
+                                      ),
+                                      decoration: InputDecoration(
+                                        hintText: 'Myemail@mail.com',
+                                        hintStyle: TextStyle(
                                           color: Color(0xFF908A95),
                                           fontSize: 14,
                                           fontFamily: 'Euclid Circular A',
                                           fontWeight: FontWeight.w400,
                                           height: 1.50,
-                                          decoration: TextDecoration.none,  // Add this line to remove any underline
                                         ),
+                                        border: InputBorder.none,  // Removes the border
                                       ),
+                                      // Validator to check if email format is valid
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter an email';
+                                        }
+                                        // Regular expression for email validation
+                                        final emailRegex = RegExp(
+                                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                                        );
+                                        if (!emailRegex.hasMatch(value)) {
+                                          return 'Please enter a valid email';
+                                        }
+                                        return null;  // No error
+                                      },
                                     ),
                                   ),
                                 ],
@@ -583,6 +622,9 @@ class SignUpState extends StatelessWidget {
         )
 
       ],
+        )
+        )
+        )
     );
   }
 }
