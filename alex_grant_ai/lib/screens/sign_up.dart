@@ -53,7 +53,7 @@ class SignUpState extends StatelessWidget {
                 ),
               ),
               Positioned(
-                left: 23.50,
+                left: 40,
                 top: 56,
                 child: Container(
                   child: Row(
@@ -67,27 +67,30 @@ class SignUpState extends StatelessWidget {
 
                       ),
                       const SizedBox(width: 51),
-                      Text(
-                        'Create an Account',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontFamily: 'Euclid Circular A',
-                          fontWeight: FontWeight.w500,
-                          height: 1.11,
-                          letterSpacing: -0.20,
-                          decoration: TextDecoration.none,  // Add this line to remove any underline
+
+
+                      Center(
+                        child: Text(
+                          'Create an Account',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24, // Adjust the font size as needed
+                            fontFamily: 'Euclid Circular A',
+                            fontWeight: FontWeight.w500,
+                            height: 1.11,
+                            letterSpacing: -0.20,
+                            decoration: TextDecoration.none, // Remove any underline
+                          ),
                         ),
                       ),
-
                     ],
                   ),
                 ),
               ),
               Positioned(
-                left: 20,
-                top: 118,
+                left: 40,
+                top: 110,
                 child: Container(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,

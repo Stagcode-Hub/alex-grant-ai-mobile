@@ -1,5 +1,7 @@
-import 'dart:async'; // Add this import at the top of your file
+import 'dart:async';
 import 'package:flutter/material.dart';
+
+import 'login.dart';
 
 class Otp extends StatelessWidget {
   const Otp({super.key});
@@ -7,12 +9,12 @@ class Otp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, // Remove the debug banner
+      debugShowCheckedModeBanner: false,
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color.fromARGB(255, 18, 32, 47),
       ),
       home: Scaffold(
-        body: SingleChildScrollView( // Wrap the content with SingleChildScrollView
+        body: SingleChildScrollView(
           child: OtpState(),
         ),
       ),
@@ -29,82 +31,73 @@ class OtpState extends StatefulWidget {
 
 class _OtpState extends State<OtpState> {
   final TextEditingController passwordController = TextEditingController();
-  bool _isPasswordVisible = false; // Track password visibility
-  int _timeRemaining = 45; // Starting time for countdown
-  late Timer _timer;
+  bool _isPasswordVisible = false;
+  int _timeRemaining = 45;
+  Timer? _timer; // Make _timer nullable to handle initialization safely
   final List<TextEditingController> otpControllers = List.generate(4, (_) => TextEditingController());
   final List<FocusNode> focusNodes = List.generate(4, (_) => FocusNode());
-
 
   @override
   void initState() {
     super.initState();
-    // Start the timer when the widget is initialized
     _startTimer();
   }
 
   void _startTimer() {
-    // If there's an existing timer, cancel it before starting a new one
-    _timer?.cancel();
-
-    // Start the timer
-    _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
+    _timer?.cancel(); // Cancel any existing timer before starting a new one
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
       setState(() {
         if (_timeRemaining > 0) {
-          _timeRemaining--; // Decrement the timer every second
+          _timeRemaining--;
         } else {
-          _timer?.cancel(); // Stop the timer when it reaches 0
+          timer.cancel();
         }
       });
     });
   }
 
   void _onChanged(String value, int index) {
-    // Move to the next field if the current field is filled
     if (value.isNotEmpty && index < otpControllers.length - 1) {
       FocusScope.of(context).requestFocus(focusNodes[index + 1]);
-    }
-    // Optionally, go back to the previous field if the current field is empty
-    else if (value.isEmpty && index > 0) {
+    } else if (value.isEmpty && index > 0) {
       FocusScope.of(context).requestFocus(focusNodes[index - 1]);
     }
   }
-  // Function to handle OTP resend and show Snackbar
+
   void _resendOtp() {
     setState(() {
-      _timeRemaining = 45; // Reset timer when OTP is resent
+      _timeRemaining = 45;
     });
-    _startTimer(); // Restart the timer
+    _startTimer();
 
-    // Show Snackbar indicating OTP resend with custom styling
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
             Image.asset(
-              'assets/images/Tick.png',  // Path to your image
-              width: 24,  // Width of the image
-              height: 24,  // Height of the image
+              'assets/images/Tick.png',
+              width: 24,
+              height: 24,
             ),
-            SizedBox(width: 8), // Space between the image and the text
-            Expanded( // Use Expanded to allow text to wrap properly
+            const SizedBox(width: 8),
+            Expanded(
               child: Text(
                 'The OTP has been resent',
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 14,
                   fontFamily: 'Euclid Circular A',
                   fontWeight: FontWeight.w600,
                 ),
-                overflow: TextOverflow.ellipsis, // Avoid overflow if the text is too long
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
         ),
-        backgroundColor: Color(0xFF15A336), // Fully opaque green color
-        duration: Duration(seconds: 2),
+        backgroundColor: const Color(0xFF15A336),
+        duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.only(bottom: 80, left: 20, right: 20), // Adjusted margin for better placement
+        margin: const EdgeInsets.only(bottom: 80, left: 20, right: 20),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
@@ -112,28 +105,25 @@ class _OtpState extends State<OtpState> {
     );
   }
 
-
-
-
   @override
   void dispose() {
-    _timer.cancel(); // Cancel the timer when the widget is disposed
+    _timer?.cancel(); // Safely cancel the timer
     for (var controller in otpControllers) {
-      controller.dispose(); // Dispose of OTP controllers
+      controller.dispose();
     }
     for (var focusNode in focusNodes) {
-      focusNode.dispose(); // Dispose of FocusNodes
+      focusNode.dispose();
     }
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold( // Keep Material here for transparent background
-
+    return Scaffold(
       body: SingleChildScrollView(
         child: Material(
           color: Colors.transparent,
-          child: Column(  // Column expects a list of children
+          child: Column(
             children: [
               Container(
                 width: MediaQuery.of(context).size.width, // Full width of the screen
@@ -372,6 +362,7 @@ class _OtpState extends State<OtpState> {
                             ),
                             child: InkWell(
                               onTap: () {
+
                                 print('Button clicked!');
                                 // Add your onTap logic here
                                 _showOtpVerifiedSuccessfullyModal(context);
@@ -407,6 +398,9 @@ class _OtpState extends State<OtpState> {
     );
   }
 }
+
+
+
 void _showOtpVerifiedSuccessfullyModal(BuildContext context) {
   showDialog(
     context: context,
@@ -426,15 +420,15 @@ void _showOtpVerifiedSuccessfullyModal(BuildContext context) {
               ),
             ),
             child: Column(
-
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween, // Space between text and button
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 200), // Add space on top of the text
+                const SizedBox(height: 20), // Add space on top of the animated checkmark
+                AnimatedCheckmark(), // Add the animated checkmark here
+                const SizedBox(height: 20), // Add space below the checkmark
                 SizedBox(
                   width: 240,
-
                   child: Text(
                     'Email Verified Successfully!',
                     textAlign: TextAlign.center,
@@ -451,7 +445,9 @@ void _showOtpVerifiedSuccessfullyModal(BuildContext context) {
                 ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).pop(); // Close the modal
-                    // _showConfirmEmailModal(context);
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) => const LoginScreen()), // Navigate to the Login screen
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF5E216D), // Set background color here
@@ -482,4 +478,60 @@ void _showOtpVerifiedSuccessfullyModal(BuildContext context) {
       );
     },
   );
+}
+
+class AnimatedCheckmark extends StatefulWidget {
+  @override
+  _AnimatedCheckmarkState createState() => _AnimatedCheckmarkState();
+}
+
+class _AnimatedCheckmarkState extends State<AnimatedCheckmark>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _opacityAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    )..repeat(reverse: true); // Repeat the animation
+
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.2).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(
+      scale: _scaleAnimation,
+      child: FadeTransition(
+        opacity: _opacityAnimation,
+        child: Icon(
+          Icons.check_circle,
+          color: Colors.purple,
+          size: 50, // Adjust the size of the checkmark
+        ),
+      ),
+    );
+  }
 }
